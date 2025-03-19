@@ -3,80 +3,62 @@
 #include <string.h>
 
 #define MAX_PROCESSES 100
-#define TIME_SLICE 5
+#define MEMORY_SIZE 1024 // Total available memory in MB
+#define TIME_QUANTUM 1    // Time quantum for user processes
 
-// Process structure
-typedef struct Process {
-    int pid;
+typedef struct {
+    int arrival_time;
     int priority;
-    int burstTime;
-    int remainingTime;
-    struct Process* next;
+    int processor_time;
+    int memory;
+    int printers;
+    int scanners;
+    int modems;
+    int cds;
+    int process_id;
 } Process;
 
-// Dispatcher structure
-typedef struct Dispatcher {
-    Process* queue;
-} Dispatcher;
+Process process_list[MAX_PROCESSES];
+int process_count = 0;
 
-// Function to create a new process
-Process* createProcess(int pid, int priority, int burstTime) {
-    Process* newProcess = (Process*)malloc(sizeof(Process));
-    newProcess->pid = pid;
-    newProcess->priority = priority;
-    newProcess->burstTime = burstTime;
-    newProcess->remainingTime = burstTime;
-    newProcess->next = NULL;
-    return newProcess;
+void read_dispatch_list(const char *filename) {
+    FILE *file = fopen(filename, "r");
+    if (!file) {
+        printf("Error: Could not open dispatch list file.\n");
+        exit(1);
+    }
+    
+    while (fscanf(file, "%d, %d, %d, %d, %d, %d, %d, %d", 
+                  &process_list[process_count].arrival_time, 
+                  &process_list[process_count].priority, 
+                  &process_list[process_count].processor_time, 
+                  &process_list[process_count].memory, 
+                  &process_list[process_count].printers, 
+                  &process_list[process_count].scanners, 
+                  &process_list[process_count].modems, 
+                  &process_list[process_count].cds) == 8) {
+        process_list[process_count].process_id = process_count + 1;
+        process_count++;
+    }
+    fclose(file);
 }
 
-// Add process to the queue
-void addProcess(Dispatcher* dispatcher, Process* newProcess) {
-    if (!dispatcher->queue) {
-        dispatcher->queue = newProcess;
-    } else {
-        Process* temp = dispatcher->queue;
-        while (temp->next) {
-            temp = temp->next;
-        }
-        temp->next = newProcess;
+void execute_dispatcher() {
+    printf("\nExecuting Processes:\n");
+    for (int i = 0; i < process_count; i++) {
+        printf("Running Process: ID=%d, Priority=%d, Time Remaining=%d sec, Memory=%d MB\n", 
+               process_list[i].process_id, process_list[i].priority, 
+               process_list[i].processor_time, process_list[i].memory);
     }
 }
 
-// FCFS Scheduler (First Come First Served)
-void FCFS(Dispatcher* dispatcher) {
-    Process* current = dispatcher->queue;
-    while (current) {
-        printf("Executing Process %d\n", current->pid);
-        current = current->next;
-    }
-}
-
-// Round Robin Scheduler
-void roundRobin(Dispatcher* dispatcher) {
-    Process* current = dispatcher->queue;
-    while (current) {
-        printf("Executing Process %d for %d units\n", current->pid, TIME_SLICE);
-        current->remainingTime -= TIME_SLICE;
-        if (current->remainingTime > 0) {
-            addProcess(dispatcher, current);
-        }
-        current = current->next;
-    }
-}
-
-// User Feedback Scheduler
-void userFeedback(Dispatcher* dispatcher) {
-    Process* current = dispatcher->queue;
-    while (current) {
-        if (current->remainingTime > TIME_SLICE) {
-            printf("Executing Process %d for %d units\n", current->pid, TIME_SLICE);
-            current->remainingTime -= TIME_SLICE;
-            addProcess(dispatcher, current);
-        } else {
-            printf("Executing Process %d for %d units\n", current->pid, current->remainingTime);
-            current->remainingTime = 0;
-        }
-        current = current->next;
-    }
+int main() {
+    char filename[100];
+    printf("Enter dispatch list filename: ");
+    scanf("%s", filename);
+    
+    read_dispatch_list(filename);
+    execute_dispatcher();
+    
+    return 0;
 }
