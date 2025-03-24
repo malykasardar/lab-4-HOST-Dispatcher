@@ -1,4 +1,3 @@
-#include <stdio.h>
 /*********************************************************************
  * Group Number: 1
  *   - Abdullah Hanoosh, Student ID: 100749026
@@ -8,7 +7,7 @@
  *********************************************************************/
 
 
-
+#include <stdio.h>
 #include <stdlib.h>
 
 #define MEMORY_SIZE 1024
