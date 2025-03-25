@@ -1,6 +1,12 @@
+/*********************************************************************
+ * Group Number: 1
+ *   - Abdullah Hanoosh, Student ID: 100749026
+ *   - Malyka Sardar, Student ID: 100752640
+ *   - Marwan Alam, Student ID: 100842087
+ *   - Vidurshan Sribalasuhabiramam, Student ID: 100558257
+ *********************************************************************/
 #include "types.h"
 
-// Define available_resources globally
 Resources available_resources = {2, 1, 1, 2};
 
 void init_resources() {
