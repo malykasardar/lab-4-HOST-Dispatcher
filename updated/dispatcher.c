@@ -5,13 +5,9 @@
  *   - Marwan Alam, Student ID: 100842087
  *   - Vidurshan Sribalasuhabiramam, Student ID: 100558257
  *********************************************************************/
-
-
-
 #include "types.h"
 #include <stdio.h>
 #include <stdlib.h>
-
 
 extern Process process_list[MAX_PROCESSES];
 extern int process_count;
@@ -46,8 +42,3 @@ void execute_dispatcher() {
                process_list[i].processor_time, process_list[i].memory);
     }
 }
-
-
-
-
-

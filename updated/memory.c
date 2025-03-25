@@ -1,57 +1,32 @@
-/*********************************************************************
- * Group Number: 1
- *   - Abdullah Hanoosh, Student ID: 100749026
- *   - Malyka Sardar, Student ID: 100752640
- *   - Marwan Alam, Student ID: 100842087
- *   - Vidurshan Sribalasuhabiramam, Student ID: 100558257
- *********************************************************************/
+#include "types.h"
 
+// Define available_resources globally
+Resources available_resources = {2, 1, 1, 2};
 
-#include <stdio.h>
-#include <stdlib.h>
-
-#define MEMORY_SIZE 1024
-
-typedef struct Block {
-    size_t size;
-    int free;
-    struct Block* next;
-} Block;
-
-static char memory[MEMORY_SIZE];
-
-static Block* freeList = NULL;
-
-void initMemory() {
-    freeList = (Block*)memory;
-    freeList->size = MEMORY_SIZE;
-    freeList->free = 1;
-    freeList->next = NULL;
+void init_resources() {
+    available_resources.printers = 2;
+    available_resources.scanners = 1;
+    available_resources.modems = 1;
+    available_resources.cds = 2;
 }
 
-void* allocateMemory(size_t size) {
-    Block* current = freeList;
-    while (current) {
-        if (current->free && current->size >= size) {
-            current->free = 0;
-            if (current->size > size + sizeof(Block)) {
-                Block* nextBlock = (Block*)((char*)current + size + sizeof(Block));
-                nextBlock->size = current->size - size - sizeof(Block);
-                nextBlock->free = 1;
-                nextBlock->next = current->next;
-                current->size = size;
-                current->next = nextBlock;
-            }
-            return (void*)((char*)current + sizeof(Block));
-        }
-        current = current->next;
+int allocate_resources(Process *p) {
+    if (available_resources.printers >= p->printers &&
+        available_resources.scanners >= p->scanners &&
+        available_resources.modems >= p->modems &&
+        available_resources.cds >= p->cds) {
+        available_resources.printers -= p->printers;
+        available_resources.scanners -= p->scanners;
+        available_resources.modems -= p->modems;
+        available_resources.cds -= p->cds;
+        return 1;
     }
-    return NULL;
+    return 0;
 }
 
-void freeMemory(void* ptr) {
-    Block* block = (Block*)((char*)ptr - sizeof(Block));
-    block->free = 1;
+void release_resources(Process *p) {
+    available_resources.printers += p->printers;
+    available_resources.scanners += p->scanners;
+    available_resources.modems += p->modems;
+    available_resources.cds += p->cds;
 }
-
-
